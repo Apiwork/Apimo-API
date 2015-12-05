@@ -1,0 +1,23 @@
+CREATE TABLE `apimo_agencies` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `external_id` int(11) DEFAULT NULL,
+  `active` tinyint(4) NOT NULL DEFAULT 1,
+  `name` varchar(150) COLLATE utf8_unicode_ci NOT NULL,
+  `address` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `address_more` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `phone_prefix` decimal(10,0) DEFAULT NULL,
+  `phone` decimal(10,0) DEFAULT NULL,
+  `fax_prefix` decimal(10,0) DEFAULT NULL,
+  `fax` decimal(10,0) DEFAULT NULL,
+  `zipcode` varchar(10) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `city` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
+  `city_id` int(11) DEFAULT NULL,
+  `country` varchar(3) COLLATE utf8_unicode_ci NOT NULL,
+  `url` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `timetable` varchar(200) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `email` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `created_at` datetime NOT NULL,
+  `updated_at` datetime NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `key_1` (`city_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;

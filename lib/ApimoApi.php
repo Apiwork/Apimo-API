@@ -16,8 +16,6 @@
  */
 abstract class Apimo_Api
 {
-    abstract function callApi();
-    abstract function create();
     abstract function update();
 
 	public function __construct()
@@ -79,6 +77,25 @@ abstract class Apimo_Api
 			$paramsString;
 	}
 
+	public function createSql($table)
+	{
+		// request for database
+		$db = $this->getDatabase();
+
+		// look if table exists
+		$sql = 'SHOW TABLES LIKE ?';
+		$stmt = $db->prepare($sql);
+		$stmt->bindParam(1, $this->dbTable[$table], PDO::PARAM_STR);
+		$stmt->execute();
+		if(!$stmt->fetchColumn())
+		{
+			// create table
+			$db->exec(str_replace('apimo_agencies', $this->dbTable['agencies'], str_replace('apimo_'.$table, $this->dbTable[$table], file_get_contents(dirname(__FILE__).'/../sql/'.$table.'.sql'))));
+			return true;
+		}
+		return false;
+	}
+
     function call($url)
     {
 		if($this->adapter == 'curl')
@@ -106,4 +123,13 @@ abstract class Apimo_Api
 		// return json response
 		return json_decode($content, true);
     }
+
+	public function callApi()
+	{
+		// build URL
+		$url = $this->buildUrl('get'.ucfirst($this->api));
+
+		// call API
+		return $this->call($url);
+	}
 }

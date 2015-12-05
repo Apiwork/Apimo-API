@@ -30,33 +30,6 @@ class Apimo_Api_Agencies extends Apimo_Api
 		return $this->call($url);
 	}
 
-	public function create()
-	{
-		// request for database
-		$db = $this->getDatabase();
-
-		// look if table exists
-		$sql = 'SHOW TABLES LIKE ?';
-		$stmt = $db->prepare($sql);
-		$stmt->bindParam(1, $this->dbTable['agencies'], PDO::PARAM_STR);
-		$stmt->execute();
-		if(!$stmt->fetchColumn())
-		{
-			// create table
-			$db->exec('CREATE TABLE `'.$this->dbTable['agencies'].'` (
-			  `id` int(11) NOT NULL AUTO_INCREMENT,
-		 	  `apimo_id` integer(11) COLLATE utf8_unicode_ci NOT NULL,
-		 	  `name` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
-		 	  `created_at` datetime COLLATE utf8_unicode_ci NOT NULL,
-		 	  `updated_at` datetime COLLATE utf8_unicode_ci NOT NULL,
-		 	 PRIMARY KEY (`id`),
-		 	 KEY `key_1` (`apimo_id`)
-			) ENGINE=InnoDB CHARSET=utf8 COLLATE=utf8_unicode_ci;');
-			return true;
-		}
-		return false;
-	}
-
 	public function update()
 	{
 		// retrieve results
@@ -66,25 +39,26 @@ class Apimo_Api_Agencies extends Apimo_Api
 		$db = $this->getDatabase();
 
 		// init vars
-		$date = date('Y-m-d H:i:s');
 		$result = array(
 			'api' => $this->api,
-			'table' => $this->dbTable['agencies'],
+			'table' => $this->dbTable[$this->api],
 			'create_table' => false,
 			'object_updated' => 0,
 			'object_created' => 0
 		);
 
         // need to create table ?
-		$result['create_table'] = $this->create();
+		$result['create_table'] = $this->createSql($this->api);
 
 		// each table
 		foreach($results as $agency)
 		{
+			$date = date('Y-m-d H:i:s');
+
 			// retrieve catalog entry
 			try {
 				$new = true;
-				$sql = 'SELECT COUNT(*) from `'.$this->dbTable['agencies'].'` WHERE apimo_id = ? LIMIT 1';
+				$sql = 'SELECT COUNT(*) from `'.$this->dbTable[$this->api].'` WHERE external_id = ? LIMIT 1';
 				$stmt = $db->prepare($sql);
 				$stmt->bindParam(1, $agency['id'], PDO::PARAM_INT);
 				$stmt->execute();
@@ -97,21 +71,24 @@ class Apimo_Api_Agencies extends Apimo_Api
 			}
 
 			// insert or update entry
+			$commonSql = 'name = :name, active = 1, city = :city, country = :country, updated_at = :updated_at';
 	  		if($new)
 			{
 				$result['object_created']++;
-				$sql = 'INSERT INTO `'.$this->dbTable['agencies'].'` SET apimo_id = :apimo_id, name = :name, created_at = :created_at, updated_at = :updated_at';
+				$sql = 'INSERT INTO `'.$this->dbTable[$this->api].'` SET external_id = :external_id, '.$commonSql.', created_at = :created_at';
 			} 
 			 else 
 			{
 				$result['object_updated']++;
-				$sql = 'UPDATE `'.$this->dbTable['agencies'].'` SET name = :name, updated_at = :updated_at WHERE apimo_id = :apimo_id';
+				$sql = 'UPDATE `'.$this->dbTable[$this->api].'` SET '.$commonSql.' WHERE external_id = :external_id';
 			}
 
 			// prepare query
 			$stmt = $db->prepare($sql);
-			$stmt->bindParam(':apimo_id', $agency['id'], PDO::PARAM_INT);
+			$stmt->bindParam(':external_id', $agency['id'], PDO::PARAM_INT);
 			$stmt->bindParam(':name', $agency['name'], PDO::PARAM_STR);
+			$stmt->bindParam(':city', $agency['city'], PDO::PARAM_STR);
+			$stmt->bindParam(':country', $agency['country'], PDO::PARAM_STR);
 			$stmt->bindParam(':updated_at', $date, PDO::PARAM_STR);
 	  		if($new)
 			{

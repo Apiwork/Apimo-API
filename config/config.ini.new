@@ -13,5 +13,5 @@ database_password = null
 
 [table]
 table_agencies = 'apimo_agencies'
-table_properties = 'apimo_agencies'
+table_properties = 'apimo_properties'
 table_referential = 'apimo_referential'
