@@ -16,5 +16,5 @@ This scripts automatic create SQL tables in your database
 
 **Nicolas Guillaud de Saint-Ferréol**
 
-* <https://apiwork.com/>
-* <https://apimo.net/>
+* <http://apiwork.com/>
+* <http://apimo.net/>
