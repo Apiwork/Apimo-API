@@ -1,0 +1,12 @@
+[webservice]
+url = 'https://api.apimo.com/api/call'
+provider = 
+key = ''
+version = 2
+; curl or php
+adapter = 'curl'
+
+[database]
+database = 'mysql:host=localhost;dbname=databasename;charset=utf8'
+database_user = 'root'
+database_password = null
