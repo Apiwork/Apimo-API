@@ -10,3 +10,8 @@ adapter = 'curl'
 database = 'mysql:host=localhost;dbname=databasename;charset=utf8'
 database_user = 'root'
 database_password = null
+
+[table]
+table_agencies = 'apimo_agencies'
+table_properties = 'apimo_agencies'
+table_referential = 'apimo_referential'
