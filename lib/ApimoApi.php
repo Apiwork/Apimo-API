@@ -16,12 +16,6 @@
  */
 abstract class Apimo_Api
 {
-	protected $dbTable = array(
-		'agencies' => 'apimo_agencies',
-		'properties' => 'apimo_agencies',
-		'referential' => 'apimo_referential'
-	);
-
     abstract function callApi();
     abstract function create();
     abstract function update();
@@ -39,6 +33,12 @@ abstract class Apimo_Api
 		$this->database = $config['database'];
 		$this->database_user = $config['database_user'];
 		$this->database_password = $config['database_password'];
+
+		$this->dbTable = array(
+			'agencies' => $config['table_agencies'],
+			'properties' => $config['table_properties'],
+			'referential' => $config['table_referential']
+		);
 
 		try {
 			$this->db = new PDO($this->database, $this->database_user, $this->database_password);
