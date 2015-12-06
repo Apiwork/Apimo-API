@@ -11,6 +11,12 @@ $api = new Apimo_Api_Agencies();
 $report = $api->update();
 print_r($report);
 
+/* Load Users */
+require_once('lib/ApimoApiUsers.php');
+$api = new Apimo_Api_Users();
+$report = $api->update();
+print_r($report);
+
 /* Load Properties */
 require_once('lib/ApimoApiProperties.php');
 $api = new Apimo_Api_Properties();

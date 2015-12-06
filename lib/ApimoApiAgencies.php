@@ -10,7 +10,7 @@
  */
 
 /**
- * Default parser implementation.
+ * Agencies parser.
  *
  * @author Nicolas Guillaud de Saint-Ferréol <support@apiwork.com>
  */
@@ -20,15 +20,6 @@ require_once('lib/ApimoApi.php');
 class Apimo_Api_Agencies extends Apimo_Api
 {
 	protected $api = 'agencies';
-
-	public function callApi()
-	{
-		// build URL
-		$url = $this->buildUrl('get'.ucfirst($this->api));
-
-		// call API
-		return $this->call($url);
-	}
 
 	public function update()
 	{
@@ -46,6 +37,7 @@ class Apimo_Api_Agencies extends Apimo_Api
 			'object_updated' => 0,
 			'object_created' => 0
 		);
+		$activeIds = array();
 
         // need to create table ?
 		$result['create_table'] = $this->createSql($this->api);
@@ -53,7 +45,11 @@ class Apimo_Api_Agencies extends Apimo_Api
 		// each table
 		foreach($results as $agency)
 		{
+			// vars
 			$date = date('Y-m-d H:i:s');
+
+			// active agencies
+			$activeIds[] = $agency['id'];
 
 			// retrieve catalog entry
 			try {
@@ -71,7 +67,7 @@ class Apimo_Api_Agencies extends Apimo_Api
 			}
 
 			// insert or update entry
-			$commonSql = 'name = :name, active = 1, city = :city, country = :country, updated_at = :updated_at';
+			$commonSql = 'company = :company, name = :name, active = :active, address = :address, address_more = :address_more, zipcode = :zipcode, city = :city, country = :country, phone = :phone, fax = :fax, email = :email, url = :url, updated_at = :updated_at';
 	  		if($new)
 			{
 				$result['object_created']++;
@@ -86,9 +82,18 @@ class Apimo_Api_Agencies extends Apimo_Api
 			// prepare query
 			$stmt = $db->prepare($sql);
 			$stmt->bindParam(':external_id', $agency['id'], PDO::PARAM_INT);
+			$stmt->bindParam(':active', $agency['active'], PDO::PARAM_BOOL);
+			$stmt->bindParam(':company', $agency['company'], PDO::PARAM_STR);
 			$stmt->bindParam(':name', $agency['name'], PDO::PARAM_STR);
+			$stmt->bindParam(':address', $agency['address'], PDO::PARAM_STR);
+			$stmt->bindParam(':address_more', $agency['address_more'], PDO::PARAM_STR);
+			$stmt->bindParam(':zipcode', $agency['zipcode'], PDO::PARAM_STR);
 			$stmt->bindParam(':city', $agency['city'], PDO::PARAM_STR);
 			$stmt->bindParam(':country', $agency['country'], PDO::PARAM_STR);
+			$stmt->bindParam(':phone', $agency['phone'], PDO::PARAM_STR);
+			$stmt->bindParam(':fax', $agency['fax'], PDO::PARAM_STR);
+			$stmt->bindParam(':email', $agency['email'], PDO::PARAM_STR);
+			$stmt->bindParam(':url', $agency['url'], PDO::PARAM_STR);
 			$stmt->bindParam(':updated_at', $date, PDO::PARAM_STR);
 	  		if($new)
 			{
@@ -102,6 +107,15 @@ class Apimo_Api_Agencies extends Apimo_Api
 			    echo "SQL Error: ".$ex->getMessage();
 			}
 	 	}
+		
+		// unactive agencies
+		$sql = 'UPDATE `'.$this->dbTable[$this->api].'` SET active = 0 WHERE external_id NOT IN ('.implode(',', $activeIds).')';
+		// execute query
+		try {
+			$db->exec($sql);
+		} catch(PDOException $ex) {
+		    echo "SQL Error: ".$ex->getMessage();
+		}
 
         // return report
 		return $result;

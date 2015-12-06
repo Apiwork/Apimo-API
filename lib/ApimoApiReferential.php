@@ -10,7 +10,7 @@
  */
 
 /**
- * Default parser implementation.
+ * Referential parser.
  *
  * @author Nicolas Guillaud de Saint-Ferréol <support@apiwork.com>
  */

@@ -10,16 +10,16 @@
  */
 
 /**
- * Properties parser.
+ * Users parser.
  *
  * @author Nicolas Guillaud de Saint-Ferréol <support@apiwork.com>
  */
 
 require_once('lib/ApimoApi.php');
 
-class Apimo_Api_Properties extends Apimo_Api
+class Apimo_Api_Users extends Apimo_Api
 {
-	protected $api = 'properties';
+	protected $api = 'users';
 
 	public function update()
 	{
@@ -34,11 +34,10 @@ class Apimo_Api_Properties extends Apimo_Api
 			'agencies' => array()
 		);
 
-		// need to create table ?
+        // need to create table ?
 		$result['create_table'] = $this->createSql($this->api);
-		$result['create_table'] = $this->createSql('medias');
 
-		// retrieve agency list
+		// retrieve user list
 		try {
 			$new = true;
 			$sql = 'SELECT id, external_id, name from `'.$this->dbTable['agencies'].'`';
@@ -65,14 +64,17 @@ class Apimo_Api_Properties extends Apimo_Api
 			);
 
 			// each table
-			foreach($results as $property)
+			foreach($results as $user)
 			{
-				// check for property entry
+				// vars
+				$date = date('Y-m-d H:i:s');
+
+				// retrieve catalog entry
 				try {
 					$new = true;
 					$sql = 'SELECT COUNT(*) from `'.$this->dbTable[$this->api].'` WHERE external_id = ? LIMIT 1';
 					$stmt = $db->prepare($sql);
-					$stmt->bindParam(1, $property['id'], PDO::PARAM_INT);
+					$stmt->bindParam(1, $user['id'], PDO::PARAM_INT);
 					$stmt->execute();
 					if($stmt->fetchColumn())
 					{
@@ -83,32 +85,29 @@ class Apimo_Api_Properties extends Apimo_Api
 				}
 
 				// insert or update entry
-				$commonSql = 'agency_id = :agency_id, 
-					external_id = :external_id,
-					category = :category,
-					price = :price,
-					currency = :currency,
-					updated_at = :updated_at';
-	  			if($new)
+				$commonSql = 'agency_id = :agency_id, active = :active, lastname = :lastname, firstname = :firstname, phone = :phone, email = :email, updated_at = :updated_at';
+	  			if($new && $user['active'])
 				{
 					$result['agencies'][$agency['external_id']]['object_created']++;
-					$sql = 'INSERT INTO `'.$this->dbTable[$this->api].'` SET '.$commonSql.', created_at = :created_at';
+					$sql = 'INSERT INTO `'.$this->dbTable[$this->api].'` SET external_id = :external_id, '.$commonSql.', created_at = :created_at';
 				} 
 				 else 
 				{
-					 $result['agencies'][$agency['external_id']]['object_updated']++;
-					 $sql = 'UPDATE `'.$this->dbTable[$this->api].'` SET '.$commonSql.' WHERE external_id = :external_id';
+					$result['agencies'][$agency['external_id']]['object_updated']++;
+					$sql = 'UPDATE `'.$this->dbTable[$this->api].'` SET '.$commonSql.' WHERE external_id = :external_id';
 				}
 
 				// prepare query
 				$stmt = $db->prepare($sql);
-				$stmt->bindParam(':agency_id', $agency['id'], PDO::PARAM_STR);
-				$stmt->bindParam(':external_id', $property['id'], PDO::PARAM_STR);
-				$stmt->bindParam(':category', $property['category'], PDO::PARAM_INT);
-				$stmt->bindParam(':price', $property['price']['value'], PDO::PARAM_INT);
-				$stmt->bindParam(':currency', $property['price']['currency'], PDO::PARAM_INT);
-				$stmt->bindParam(':updated_at', $date, PDO::PARAM_INT);
-  				if($new)
+				$stmt->bindParam(':external_id', $user['id'], PDO::PARAM_INT);
+				$stmt->bindParam(':agency_id', $agency['id'], PDO::PARAM_BOOL);
+				$stmt->bindParam(':active', $user['active'], PDO::PARAM_BOOL);
+				$stmt->bindParam(':lastname', $user['lastname'], PDO::PARAM_STR);
+				$stmt->bindParam(':firstname', $user['firstname'], PDO::PARAM_STR);
+				$stmt->bindParam(':phone', $user['phone'], PDO::PARAM_STR);
+				$stmt->bindParam(':email', $user['email'], PDO::PARAM_STR);
+				$stmt->bindParam(':updated_at', $date, PDO::PARAM_STR);
+	  			if($new && $user['active'])
 				{
 					$stmt->bindParam(':created_at', $date, PDO::PARAM_STR);
 				}
@@ -119,7 +118,7 @@ class Apimo_Api_Properties extends Apimo_Api
 				} catch(PDOException $ex) {
 					echo "SQL Error: ".$ex->getMessage();
 				}
-	 		}
+	 	   }
 		}
 
         // return report

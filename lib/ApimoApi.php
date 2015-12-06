@@ -34,8 +34,10 @@ abstract class Apimo_Api
 
 		$this->dbTable = array(
 			'agencies' => $config['table_agencies'],
+			'medias' => $config['table_medias'],
 			'properties' => $config['table_properties'],
-			'referential' => $config['table_referential']
+			'referential' => $config['table_referential'],
+			'users' => $config['table_users']
 		);
 
 		try {
@@ -96,6 +98,15 @@ abstract class Apimo_Api
 		return false;
 	}
 
+	public function callApi($params = array())
+	{
+		// build URL
+		$url = $this->buildUrl('get'.ucfirst($this->api), 'json', $params);
+
+		// call API
+		return $this->call($url);
+	}
+
     function call($url)
     {
 		if($this->adapter == 'curl')
@@ -123,13 +134,4 @@ abstract class Apimo_Api
 		// return json response
 		return json_decode($content, true);
     }
-
-	public function callApi()
-	{
-		// build URL
-		$url = $this->buildUrl('get'.ucfirst($this->api));
-
-		// call API
-		return $this->call($url);
-	}
 }

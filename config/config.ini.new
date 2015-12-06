@@ -13,5 +13,7 @@ database_password = null
 
 [table]
 table_agencies = 'apimo_agencies'
+table_medias = 'apimo_medias'
 table_properties = 'apimo_properties'
 table_referential = 'apimo_referential'
+table_users = 'apimo_users'
