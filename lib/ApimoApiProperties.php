@@ -85,7 +85,12 @@ class Apimo_Api_Properties extends Apimo_Api
 				// insert or update entry
 				$commonSql = 'agency_id = :agency_id, 
 					external_id = :external_id,
+					reference = :reference,
+					user_id = :user_id,
 					category = :category,
+					type = :type,
+					subtype = :subtype,
+					city = :city,
 					price = :price,
 					currency = :currency,
 					updated_at = :updated_at';
@@ -100,11 +105,28 @@ class Apimo_Api_Properties extends Apimo_Api
 					 $sql = 'UPDATE `'.$this->dbTable[$this->api].'` SET '.$commonSql.' WHERE external_id = :external_id';
 				}
 
+				// retrieve user_id
+				try {
+					$new = true;
+					$sqlUser = 'SELECT id from `'.$this->dbTable['users'].'` WHERE external_id = :external_id';
+					$stmt2 = $db->prepare($sqlUser);
+					$stmt2->bindParam(':external_id', $property['user']['id'], PDO::PARAM_INT);
+					$stmt2->execute();
+				    $userId = $stmt2->fetchColumn();
+				} catch(PDOException $ex) {
+				    echo "SQL Error: ".$ex->getMessage();
+				}
+
 				// prepare query
 				$stmt = $db->prepare($sql);
 				$stmt->bindParam(':agency_id', $agency['id'], PDO::PARAM_STR);
+				$stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
 				$stmt->bindParam(':external_id', $property['id'], PDO::PARAM_STR);
+				$stmt->bindParam(':reference', $property['reference'], PDO::PARAM_STR);
 				$stmt->bindParam(':category', $property['category'], PDO::PARAM_INT);
+				$stmt->bindParam(':type', $property['type'], PDO::PARAM_INT);
+				$stmt->bindParam(':subtype', $property['type_specific'], PDO::PARAM_INT);
+				$stmt->bindParam(':city', $property['city']['name'], PDO::PARAM_INT);
 				$stmt->bindParam(':price', $property['price']['value'], PDO::PARAM_INT);
 				$stmt->bindParam(':currency', $property['price']['currency'], PDO::PARAM_INT);
 				$stmt->bindParam(':updated_at', $date, PDO::PARAM_INT);
