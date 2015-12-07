@@ -50,6 +50,7 @@ abstract class Apimo_Api
 
 	function getDatabase()
 	{
+    	$this->db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 		return $this->db;
 	}
 

@@ -91,8 +91,37 @@ class Apimo_Api_Properties extends Apimo_Api
 					type = :type,
 					subtype = :subtype,
 					city = :city,
+					city_id = :city_id,
+					district = :district,
+					district_id = :district_id,
+					longitude = :longitude,
+					latitude = :latitude,
 					price = :price,
+					price_fees = :price_fees,
+					price_hide = :price_hide,
+					commission = :price_commission,
+					guarantee = :price_guarantee,
 					currency = :currency,
+					area = :area,
+					rooms = :rooms,
+					bedrooms = :bedrooms,
+					sleeps = :sleeps,
+					view_type = :view_type,
+					view_landscape = :view_landscape,
+					orientations = :orientations,
+					`condition` = :condition,
+					standing = :standing,
+					activities = :activities,
+					services = :services,
+					floor = :floor,
+					heating_device = :heating_device,
+					heating_access = :heating_access,
+					heating_type = :heating_type,
+					hot_water_device = :hot_water_device,
+					hot_water_access = :hot_water_access,
+					waste_water = :waste_water,
+					proximities = :proximities,
+					tags = :tags,
 					updated_at = :updated_at';
 	  			if($new)
 				{
@@ -113,6 +142,10 @@ class Apimo_Api_Properties extends Apimo_Api
 					$stmt2->bindParam(':external_id', $property['user']['id'], PDO::PARAM_INT);
 					$stmt2->execute();
 				    $userId = $stmt2->fetchColumn();
+					if(!$userId)
+					{
+						$userId = null;
+					}
 				} catch(PDOException $ex) {
 				    echo "SQL Error: ".$ex->getMessage();
 				}
@@ -127,8 +160,37 @@ class Apimo_Api_Properties extends Apimo_Api
 				$stmt->bindParam(':type', $property['type'], PDO::PARAM_INT);
 				$stmt->bindParam(':subtype', $property['type_specific'], PDO::PARAM_INT);
 				$stmt->bindParam(':city', $property['city']['name'], PDO::PARAM_INT);
-				$stmt->bindParam(':price', $property['price']['value'], PDO::PARAM_INT);
+				$stmt->bindParam(':city_id', $property['city']['id'], PDO::PARAM_INT);
+				$stmt->bindParam(':district', $property['district']['name'], PDO::PARAM_INT);
+				$stmt->bindParam(':district_id', $property['district']['id'], PDO::PARAM_INT);
+				$stmt->bindParam(':longitude', $property['longitude'], PDO::PARAM_STR);
+				$stmt->bindParam(':latitude', $property['latitude'], PDO::PARAM_STR);
+				$stmt->bindParam(':price', $property['price']['value'], PDO::PARAM_STR);
+				$stmt->bindParam(':price_fees', $property['price']['fees'], PDO::PARAM_STR);
+				$stmt->bindParam(':price_hide', $property['price']['hide'], PDO::PARAM_BOOL);
+				$stmt->bindParam(':price_commission', $property['price']['commission'], PDO::PARAM_STR);
+				$stmt->bindParam(':price_guarantee', $property['price']['guarantee'], PDO::PARAM_STR);
 				$stmt->bindParam(':currency', $property['price']['currency'], PDO::PARAM_INT);
+				$stmt->bindParam(':area', $property['area']['value'], PDO::PARAM_STR);
+				$stmt->bindParam(':rooms', $property['rooms'], PDO::PARAM_STR);
+				$stmt->bindParam(':bedrooms', $property['bedrooms'], PDO::PARAM_INT);
+				$stmt->bindParam(':sleeps', $property['sleeps'], PDO::PARAM_INT);
+				$stmt->bindParam(':heating_device', $property['heating']['device'], PDO::PARAM_INT);
+				$stmt->bindParam(':heating_access', $property['heating']['access'], PDO::PARAM_INT);
+				$stmt->bindParam(':heating_type', $property['heating']['type'], PDO::PARAM_INT);
+				$stmt->bindParam(':hot_water_device', $property['water']['hot_device'], PDO::PARAM_INT);
+				$stmt->bindParam(':hot_water_access', $property['water']['hot_access'], PDO::PARAM_INT);
+				$stmt->bindParam(':waste_water', $property['water']['waste'], PDO::PARAM_INT);
+				$stmt->bindParam(':view_type', $property['view']['type'], PDO::PARAM_INT);
+				$stmt->bindParam(':view_landscape', $property['view']['landscape'], PDO::PARAM_STR);
+				$stmt->bindParam(':orientations', $property['orientations'], PDO::PARAM_STR);
+				$stmt->bindParam(':condition', $property['condition'], PDO::PARAM_INT);
+				$stmt->bindParam(':standing', $property['standing'], PDO::PARAM_INT);
+				$stmt->bindParam(':activities', $property['activities'], PDO::PARAM_STR);
+				$stmt->bindParam(':services', $property['services'], PDO::PARAM_STR);
+				$stmt->bindParam(':proximities', $property['proximities'], PDO::PARAM_STR);
+				$stmt->bindParam(':tags', $property['tags'], PDO::PARAM_STR);
+				$stmt->bindParam(':floor', $property['floor']['type'], PDO::PARAM_INT);
 				$stmt->bindParam(':updated_at', $date, PDO::PARAM_INT);
   				if($new)
 				{
